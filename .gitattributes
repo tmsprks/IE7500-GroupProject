@@ -1,0 +1,11 @@
+# Always use LF in source files regardless of OS
+* text=auto
+
+# Notebook files should use LF consistently
+*.ipynb text eol=lf
+
+# Shell scripts for Unix systems
+*.sh text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf

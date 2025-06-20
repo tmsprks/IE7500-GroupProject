@@ -42,7 +42,7 @@ class DataGenerator:
     def generate_datasets(self, 
                           info_file: str=None, 
                           ensure_uniqueness_across_same_dataset_type: bool=True, 
-                          randomize_samples=True) -> List[Tuple[str, bool, bool, pd.DataFrame]]:
+                          randomize_samples=False) -> List[Tuple[str, bool, bool, pd.DataFrame]]:
 
         """ generate_datasets downsamples the datasets from source DataFrames based on a configuration CSV.
             the source DataFrames are passed to the constructor.
@@ -54,7 +54,7 @@ class DataGenerator:
                     If set to False, each subsequent call to generate_dataset may not return the same samples.  
                     If set to True, then the same samples are return after each call.
             
-            ensure_uniqueness_across_same_dataset_type = True, randomize_samples = False:
+            ensure_uniqueness_across_same_dataset_type = True, randomize_samples = False:  (default values)
                 the behavior is no duplicate rows in the same dataset type files.
                 the file will look the same after repeated calls to generate_dataset
                 use this setting to generate files that don't overlap but deterministic

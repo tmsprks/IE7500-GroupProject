@@ -14,16 +14,12 @@ class KaggleDataSet:
         self.kaggle_data_loader = kaggle_data_loader
         self.train_df = kaggle_data_loader.get_train_df()
         self.test_df = kaggle_data_loader.get_test_df()
-        self.validation_df = None
 
     def get_train_df(self):
         return self.train_df
     
     def get_test_df(self):
         return self.test_df
-    
-    def get_validation_df(self):
-        return self.validation_df
     
 # Example usage:
 if __name__ == "__main__":

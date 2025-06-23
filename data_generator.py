@@ -2,6 +2,7 @@
 from typing import List, Tuple
 import pandas as pd
 from kaggle_dataset import KaggleDataSet
+from sa_data_factory import SADataFactory
 
 class DataGenerator:
 
@@ -21,13 +22,13 @@ class DataGenerator:
 
 
     def __init__(self, 
-                 kaggle_dataset: KaggleDataSet):
+                 sa_data_factory: SADataFactory):
 
         ### Maps data set type to the dataframe variable
         self.dataset_map = {
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TRAIN_VAL: kaggle_dataset.get_train_df(),
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TEST_VAL: kaggle_dataset.get_test_df(),
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_VALIDATION_VAL: kaggle_dataset.get_validation_df()
+            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TRAIN_VAL: sa_data_factory.get_train_df(),
+            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TEST_VAL: sa_data_factory.get_test_df(),
+            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_VALIDATION_VAL: sa_data_factory.get_validation_df()
         }
 
         ### Initialize a dictionary to track used indices for each dataset type

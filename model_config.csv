@@ -1,2 +1,2 @@
 Self Attention Model,SASelfAttentionModel,SASelfAttentionModel,train_60K.csv,test_20K.csv,validate_20K.csv,"vocab_size=1000,max_features=20000,sequence_length=100,embedding_dim=20000,embed_output=128,bi_lstm_input_dim=64,self_attention_input_dim=64,dense_1_layer_dim=64,dense_1_dropout=0.5,final_dense_dim=2"
-MultiHead Attention Model,sa_multihead_attention_model,SA_MultiHeadAttentionModel,train_80K.csv,test_20K.csv,validate_20K.csv
+MultiHead Attention Model,sa_multihead_attention_model,SA_MultiHeadAttentionModel,train_60K.csv,test_20K.csv,validate_20K.csv

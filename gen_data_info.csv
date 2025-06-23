@@ -4,3 +4,6 @@ train,80000,train_80K.csv
 test,1000,test_1K.csv
 test,10000,test_10K.csv
 test,20000,test_20K.csv
+validation,1000,validate_1K.csv
+validation,10000,validate_10K.csv
+validation,20000,validate_20K.csv

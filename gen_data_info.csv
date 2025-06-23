@@ -1,6 +1,6 @@
 train,2000,train_2K.csv
 train,50000,train_50K.csv
-train,80000,train_80K.csv
+train,60000,train_60K.csv
 test,1000,test_1K.csv
 test,10000,test_10K.csv
 test,20000,test_20K.csv

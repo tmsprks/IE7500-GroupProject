@@ -54,19 +54,13 @@ class SAModelConfigLoader:
 
         ### Use the path to model config passed into the constructor or assume the default model config file name
         ### and current working directory location
-        model_config_file = self.path_to_model_config or SAModelConfig.DEFAULT_MODEL_CONFIG_FILE_NAME
+        model_config_file = self.path_to_model_config or SAModelConfig.get_default_model_config_file_name()
 
         ### Read the model config csv file
         try:
             model_config_df = pd.read_csv(model_config_file, 
                                           header=None, 
-                                          names=[SAModelConfig.MODEL_CONFIG_MODEL_NAME, 
-                                                 SAModelConfig.MODEL_CONFIG_MODULE_NAME, 
-                                                 SAModelConfig.MODEL_CONFIG_CLASS_NAME,
-                                                 SAModelConfig.MODEL_CONFIG_TRAIN_CSV,
-                                                 SAModelConfig.MODEL_CONFIG_TEST_CSV,
-                                                 SAModelConfig.MODEL_CONFIG_VALIDATION_CSV,
-                                                 SAModelConfig.MODEL_CONFIG_MODEL_PARAMS])
+                                          names=SAModelConfig.get_model_config_column_names())
         except FileNotFoundError:
             print(f"Error: File '{model_config_file}' not found.")
             return []
@@ -76,13 +70,13 @@ class SAModelConfigLoader:
 
         # Process each row in model config file
         for _, row in model_config_df.iterrows():
-            model_name = row[SAModelConfig.MODEL_CONFIG_MODEL_NAME]
-            module_name = row[SAModelConfig.MODEL_CONFIG_MODULE_NAME]
-            class_name = row[SAModelConfig.MODEL_CONFIG_CLASS_NAME]
-            train_csv = row[SAModelConfig.MODEL_CONFIG_TRAIN_CSV]
-            test_csv = row[SAModelConfig.MODEL_CONFIG_TEST_CSV]
-            validation_csv = row[SAModelConfig.MODEL_CONFIG_VALIDATION_CSV]
-            model_params = row[SAModelConfig.MODEL_CONFIG_MODEL_PARAMS]
+            model_name = row[SAModelConfig.get_model_config_model_name()]
+            module_name = row[SAModelConfig.get_model_config_model_module_name()]
+            class_name = row[SAModelConfig.get_model_config_model_class_name()]
+            train_csv = row[SAModelConfig.get_model_config_model_train_csv_name()]
+            test_csv = row[SAModelConfig.get_model_config_model_test_csv_name()]
+            validation_csv = row[SAModelConfig.get_model_config_model_validation_csv_name()]
+            model_params = row[SAModelConfig.get_model_config_model_params()]
 
             self.list_of_model_config.append(SAModelConfig(model_name, module_name, class_name, train_csv, test_csv, validation_csv, self._process_model_params(model_params)))
         
@@ -90,3 +84,20 @@ class SAModelConfigLoader:
 
     def get_list_of_model_config(self) -> List[SAModelConfig]:
         return self.list_of_model_config
+    
+    def find_model_config(self, 
+                          model_module_name:str=None, 
+                          model_class_name:str=None) -> SAModelConfig:
+        list_of_model_config_len = len(self.list_of_model_config) or 0 
+        found = list_of_model_config_len == 0
+        i = 0
+        return_value = None
+
+        while not found:
+            model_config = self.list_of_model_config[i]
+            found = model_config.get_model_module_name() == model_module_name and model_config.get_model_class_name () == model_class_name
+            if found:
+                return_value = model_config
+            i += 1
+        
+        return return_value

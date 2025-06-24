@@ -35,3 +35,19 @@ class SASentimentModel(ABC):
         """Evaluate model performance using parameters in SAModelParams."""
         pass
 
+    @abstractmethod
+    def summary(self, sa_model_param:SAModelParams=None) -> None:
+        """Model summary"""
+        pass
+
+    ###
+    ### Run the model pipeline
+    ###
+    def run(self, sa_model_param:SAModelParams=None) -> None:
+        self.register(sa_model_param)
+        self.preprocess(sa_model_param)
+        self.fit(sa_model_param)
+        self.summary(sa_model_param)
+        self.predict(sa_model_param)
+        self.evaluate(sa_model_param)        
+

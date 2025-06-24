@@ -112,7 +112,7 @@ class DataGenerator:
             source_df = self.dataset_map[dataset_type]
             
             # Check label distribution
-            label_counts = source_df[KaggleDataSet.POLARITY_COLUMN_NAME].value_counts()
+            label_counts = source_df[KaggleDataSet.get_kaggle_polarity_column_name()].value_counts()
             print(f"\nProcessing {output_file} from {dataset_type} dataset")
             print("Label counts:\n", label_counts)
             
@@ -122,30 +122,30 @@ class DataGenerator:
             # Filter available rows based on used indices if ensure_uniqueness_across_same_dataset_type is True
             if ensure_uniqueness_across_same_dataset_type:
                 available_df = source_df[~source_df.index.isin(self.used_indices[dataset_type])]
-                label_counts_available = available_df[KaggleDataSet.POLARITY_COLUMN_NAME].value_counts()
-                if (label_counts_available.get(KaggleDataSet.POLARITY_VALUE_1, 0) < half_size or 
-                    label_counts_available.get(KaggleDataSet.POLARITY_VALUE_2, 0) < half_size):
-                    print(f"Error: Not enough unique rows for label {KaggleDataSet.POLARITY_VALUE_1} or "
-                          f"label {KaggleDataSet.POLARITY_VALUE_2} to sample {half_size} each in {output_file}. Skipping.")
+                label_counts_available = available_df[KaggleDataSet.get_kaggle_polarity_column_name()].value_counts()
+                if (label_counts_available.get(KaggleDataSet.get_kaggle_polarity_value_1(), 0) < half_size or 
+                    label_counts_available.get(KaggleDataSet.get_kaggle_polarity_value_2(), 0) < half_size):
+                    print(f"Error: Not enough unique rows for label {KaggleDataSet.get_kaggle_polarity_value_1()} or "
+                          f"label {KaggleDataSet.get_kaggle_polarity_value_2()} to sample {half_size} each in {output_file}. Skipping.")
                     continue
             else:
                 available_df = source_df
-                if (label_counts.get(KaggleDataSet.POLARITY_VALUE_1, 0) < half_size or 
-                    label_counts.get(KaggleDataSet.POLARITY_VALUE_2, 0) < half_size):
-                    print(f"Error: Not enough rows for label {KaggleDataSet.POLARITY_VALUE_1} or "
-                          f"label {KaggleDataSet.POLARITY_VALUE_2} to sample {half_size} each in {output_file}. Skipping.")
+                if (label_counts.get(KaggleDataSet.get_kaggle_polarity_value_1(), 0) < half_size or 
+                    label_counts.get(KaggleDataSet.get_kaggle_polarity_value_2(), 0) < half_size):
+                    print(f"Error: Not enough rows for label {KaggleDataSet.get_kaggle_polarity_value_1()} or "
+                          f"label {KaggleDataSet.get_kaggle_polarity_value_2()} to sample {half_size} each in {output_file}. Skipping.")
                     continue
             
             # Sample half_size rows for each label
             if randomize_samples:
                 ### Shuffle the sampling of rows from each label
-                sample_1 = available_df[available_df[KaggleDataSet.POLARITY_COLUMN_NAME] == KaggleDataSet.POLARITY_VALUE_1].sample(n=half_size)
-                sample_2 = available_df[available_df[KaggleDataSet.POLARITY_COLUMN_NAME] == KaggleDataSet.POLARITY_VALUE_2].sample(n=half_size)
+                sample_1 = available_df[available_df[KaggleDataSet.get_kaggle_polarity_column_name()] == KaggleDataSet.get_kaggle_polarity_value_1()].sample(n=half_size)
+                sample_2 = available_df[available_df[KaggleDataSet.get_kaggle_polarity_column_name()] == KaggleDataSet.get_kaggle_polarity_value_2()].sample(n=half_size)
             else:
                 ### Do not shuffle sample, use the same seed for each call to this method so the row "sampling" from each label is the same
-                sample_1 = available_df[available_df[KaggleDataSet.POLARITY_COLUMN_NAME] == KaggleDataSet.POLARITY_VALUE_1].sample(
+                sample_1 = available_df[available_df[KaggleDataSet.get_kaggle_polarity_column_name()] == KaggleDataSet.get_kaggle_polarity_value_1()].sample(
                     n=half_size, random_state=DataGenerator.RANDOMIZE_STATE_VAL)
-                sample_2 = available_df[available_df[KaggleDataSet.POLARITY_COLUMN_NAME] == KaggleDataSet.POLARITY_VALUE_2].sample(
+                sample_2 = available_df[available_df[KaggleDataSet.get_kaggle_polarity_column_name()] == KaggleDataSet.get_kaggle_polarity_value_2()].sample(
                     n=half_size, random_state=DataGenerator.RANDOMIZE_STATE_VAL)
 
             # Combine the samples
@@ -170,7 +170,7 @@ class DataGenerator:
             
             # Verify the save
             print(f"Downsampled dataset saved to '{output_file}', ensure uniqueness across dataset type: {ensure_uniqueness_across_same_dataset_type}, randomize samples: {randomize_samples}")
-            print("Downsampled dataset label counts:\n", downsampled_df[KaggleDataSet.POLARITY_COLUMN_NAME].value_counts())
+            print("Downsampled dataset label counts:\n", downsampled_df[KaggleDataSet.get_kaggle_polarity_column_name()].value_counts())
             print("Downsampled dataset size:", downsampled_df.shape)
             
             ##

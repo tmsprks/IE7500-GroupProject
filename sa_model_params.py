@@ -1,5 +1,5 @@
 
-from typing import Dict
+from typing import Dict, List
 import pandas as pd
 from sa_data_loader import SADataLoader
 from sa_model_config import SAModelConfig
@@ -32,3 +32,6 @@ class SAModelParams:
     
     def get_all_model_params(self) -> Dict:
         return self.model_params
+    
+    def verify_model_params(self, model_params_to_check:List[str]) -> bool:
+        return self.sa_model_config.verify_model_params(model_params_to_check)

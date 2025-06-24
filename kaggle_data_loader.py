@@ -1,5 +1,6 @@
 
 import os
+from typing import List
 import pandas as pd
 import kagglehub
 
@@ -10,7 +11,7 @@ class KaggleDataLoader:
         self.train_df = None
         self.test_df = None
 
-    def load_data(self, column_names: list[str]):
+    def load_data(self, column_names: List[str]) -> str:
         # Download latest version
         path = kagglehub.dataset_download(self.kaggle_path)
 
@@ -26,10 +27,10 @@ class KaggleDataLoader:
 
         return path
     
-    def get_train_df(self):
+    def get_train_df(self) -> pd.DataFrame:
         return self.train_df
     
-    def get_test_df(self):
+    def get_test_df(self) -> pd.DataFrame:
         return self.test_df
     
 # Example usage:

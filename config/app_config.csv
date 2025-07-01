@@ -1,0 +1,8 @@
+component,key,value
+utils,path_to_data,data
+utils,path_to_config,config
+model,path_to_checkpoint,checkpoint
+framework,path_to_model,model
+test,path_to_config,config
+test,path_to_output_directory,data
+main,absolute_path_to_kaggle_data,"kritanjalijain/amazon-reviews"

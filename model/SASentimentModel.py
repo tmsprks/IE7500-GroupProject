@@ -1,15 +1,21 @@
 
 from abc import ABC, abstractmethod
-from sa_model_params import SAModelParams
+from utils.sa_app_config import SAAppConfig
+from utils.sa_model_params import SAModelParams
 
 # Abstract base class for sentiment models
 class SASentimentModel(ABC):
 
-    def __init__(self, sa_model_param:SAModelParams=None):
-        self.params = sa_model_param
+
+    def __init__(self,
+                 sa_app_config: SAAppConfig,
+                 sa_model_param:SAModelParams=None):
+        """sa_model_param is the initial param.  """
+        self.sa_app_config = sa_app_config
+        self.sa_model_params = sa_model_param
 
     def get_model_params(self) -> SAModelParams:
-        return self.params
+        return self.sa_model_params
     
     @abstractmethod
     def register(self, sa_model_param:SAModelParams=None) -> str:

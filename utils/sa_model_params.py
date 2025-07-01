@@ -1,8 +1,8 @@
 
 from typing import Dict, List
 import pandas as pd
-from sa_data_loader import SADataLoader
-from sa_model_config import SAModelConfig
+from utils.sa_data_loader import SADataLoader
+from utils.sa_model_config import SAModelConfig
 
 class SAModelParams:
     def __init__(self,

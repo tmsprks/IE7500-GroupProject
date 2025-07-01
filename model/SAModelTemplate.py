@@ -4,16 +4,19 @@ import inspect
 
 import tensorflow as tf
 from sklearn.metrics import accuracy_score, f1_score
-from SASentimentModel import SASentimentModel, SAModelParams
-from kaggle_dataset import KaggleDataSet
+from model.SASentimentModel import SASentimentModel, SAModelParams
+from utils.kaggle_dataset import KaggleDataSet
+from utils.sa_app_config import SAAppConfig
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 class SAModelTemplate(SASentimentModel):
-    def __init__(self, model_params: SAModelParams):
-        super().__init__(model_params)
+    def __init__(self,
+                 sa_app_config: SAAppConfig,
+                 model_params: SAModelParams):
+        super().__init__(sa_app_config, model_params)
         self.model = None               ### store the actual model you will create later
 
     def register(self, sa_model_param:SAModelParams=None) -> str:

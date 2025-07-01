@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from kaggle_dataset import KaggleDataSet
+from utils.kaggle_dataset import KaggleDataSet
 
 class SADataFactory:
     DEFAULT_TRAIN_TEST_SPLIT_RATIO = 0.2

@@ -2,7 +2,7 @@
 import os
 from typing import List, Any
 import pandas as pd
-from  kaggle_data_loader import KaggleDataLoader
+from  .kaggle_data_loader import KaggleDataLoader
 
 class KaggleDataSet:
 

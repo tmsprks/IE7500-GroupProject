@@ -8,13 +8,13 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 
-from SASentimentModel import SASentimentModel
-from kaggle_dataset import KaggleDataSet
+from model.SASentimentModel import SASentimentModel
+from utils.kaggle_dataset import KaggleDataSet
 
-from sa_model_pipeline import SAModelPipeline
-from sa_model_config_loader import SAModelConfigLoader
-from sa_data_loader import SADataLoader
-from sa_model_params import SAModelParams
+from utils.sa_model_config_loader import SAModelConfigLoader
+from utils.sa_data_loader import SADataLoader
+from utils.sa_model_params import SAModelParams
+from utils.sa_app_config import SAAppConfig
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -49,8 +49,10 @@ class SASelfAttentionModel(SASentimentModel):
                                             "epoch",
                                             "batch_size"]
     
-    def __init__(self, model_params: SAModelParams):
-        super().__init__(model_params)
+    def __init__(self, 
+                 sa_app_config: SAAppConfig,
+                 model_params: SAModelParams):
+        super().__init__(sa_app_config, model_params)
         self.vocab_size = int(model_params.get_model_param("vocab_size"))
         self.sequence_length = int(model_params.get_model_param("sequence_length"))
         self.embedding_dim = int(model_params.get_model_param("embedding_dim"))

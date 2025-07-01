@@ -7,9 +7,10 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.metrics import classification_report
 
-from SASentimentModel import SASentimentModel
-from kaggle_dataset import KaggleDataSet
-from sa_model_params import SAModelParams
+from model.SASentimentModel import SASentimentModel
+from utils.kaggle_dataset import KaggleDataSet
+from utils.sa_model_params import SAModelParams
+from utils.sa_app_config import SAAppConfig
 
 import re
 from tensorflow.keras.optimizers import Adam
@@ -25,8 +26,11 @@ class SARnnModel(SASentimentModel):
                               "epoch",
                               "batch_size"]
 
-    def __init__(self, model_params: SAModelParams):
+    def __init__(self, 
+                 sa_app_config: SAAppConfig,
+                 model_params: SAModelParams):
         super().__init__(model_params)
+        self.sa_app_config = sa_app_config
         self.vocab_size = int(model_params.get_model_param("vocab_size"))
         self.sequence_length = int(model_params.get_model_param("sequence_length"))
         self.embedding_dim = int(model_params.get_model_param("embedding_dim"))
@@ -123,8 +127,20 @@ class SARnnModel(SASentimentModel):
             self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
             logger.info("Built and compiled new model")
 
+            ###
+            ### Previous version of determining data directory.
+            ### Updated version  uses app config, see below
+            ###
+            ###data_directory = os.getcwd()
+            ###logger.info(f"{class_name}.{method_name}(): data directory is NONE.  Using {data_directory}")
+
+        checkpoint_dir = self.sa_app_config.model.checkpoint_dir
+        checkpoint_file_prefix = os.path.join(checkpoint_dir)
+        checkpoint_file_prefix += '\\'
+        logger.info(f"{class_name}.{method_name}(): Checkpoint dir: {checkpoint_dir}.   Checkpoint path: {checkpoint_file_prefix}")
+
         checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
-            filepath='model_checkpoint_epoch{epoch:02d}_valacc{val_accuracy:.4f}.keras',
+            filepath=checkpoint_file_prefix + 'model_checkpoint_epoch{epoch:02d}_valacc{val_accuracy:.4f}.keras',
             monitor='val_accuracy',
             save_best_only=False, ### Saves every epoch
             save_weights_only=False, ### Saves entire model
@@ -144,10 +160,19 @@ class SARnnModel(SASentimentModel):
             verbose=1
         )
 
-        ### Logs best validation accurary
-        best_epoch = max(self.history.epoch) + 1
-        best_val_acc = max(self.history.history['val_accuracy'])
-        logger.info(f"Best val_accuracy: {best_val_acc:.4f} at epoch {best_epoch}")
+        ###
+        ### Potentially the history can be empty so max(self.history.epoch) throws an exception.
+        ### Since retrieving best_epoch and best_val_acc is for informational purposes, we can put
+        ### a try block around this code and continue with the pipeline if the code raises and exception
+        ###
+        try:
+            ### Logs best validation accurary
+            best_epoch = max(self.history.epoch) + 1
+            best_val_acc = max(self.history.history['val_accuracy'])
+            logger.info(f"Best val_accuracy: {best_val_acc:.4f} at epoch {best_epoch}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
 
         logger.info(f"{class_name}.{method_name}(): Model fitted")
         logger.info(f"{class_name}.{method_name}(): Completed")

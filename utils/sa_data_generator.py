@@ -1,10 +1,18 @@
 
+import inspect
+import logging
+import os
+
 from typing import List, Tuple
 import pandas as pd
-from kaggle_dataset import KaggleDataSet
-from sa_data_factory import SADataFactory
+from utils.kaggle_dataset import KaggleDataSet
+from utils.sa_data_factory import SADataFactory
 
-class DataGenerator:
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+class SADataGenerator:
 
     HALF_SIZE = 2
     RANDOMIZE_STATE_VAL = 128
@@ -26,22 +34,23 @@ class DataGenerator:
 
         ### Maps data set type to the dataframe variable
         self.dataset_map = {
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TRAIN_VAL: sa_data_factory.get_train_df(),
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TEST_VAL: sa_data_factory.get_test_df(),
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_VALIDATION_VAL: sa_data_factory.get_validation_df()
+            SADataGenerator.GEN_DATA_INFO_DATASET_TYPE_TRAIN_VAL: sa_data_factory.get_train_df(),
+            SADataGenerator.GEN_DATA_INFO_DATASET_TYPE_TEST_VAL: sa_data_factory.get_test_df(),
+            SADataGenerator.GEN_DATA_INFO_DATASET_TYPE_VALIDATION_VAL: sa_data_factory.get_validation_df()
         }
 
         ### Initialize a dictionary to track used indices for each dataset type
         ### in order to ensure uniqueness
         self.used_indices = {
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TRAIN_VAL: set(),
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_TEST_VAL: set(),
-            DataGenerator.GEN_DATA_INFO_DATASET_TYPE_VALIDATION_VAL: set()
+            SADataGenerator.GEN_DATA_INFO_DATASET_TYPE_TRAIN_VAL: set(),
+            SADataGenerator.GEN_DATA_INFO_DATASET_TYPE_TEST_VAL: set(),
+            SADataGenerator.GEN_DATA_INFO_DATASET_TYPE_VALIDATION_VAL: set()
         }
 
 
     def generate_datasets(self, 
-                          info_file: str=None, 
+                          path_to_data_generation_config_directory: str=None, 
+                          path_to_data_generation_output_directory: str=None,
                           ensure_uniqueness_across_same_dataset_type: bool=True, 
                           randomize_samples=False) -> List[Tuple[str, bool, bool, pd.DataFrame]]:
 
@@ -81,29 +90,46 @@ class DataGenerator:
                 the value for randomize_samples,
                 pd.DataFrame of the combined output for the output file.
         """
+    
+        class_name = self.__class__.__name__
+        method_name = inspect.currentframe().f_code.co_name
 
-        ### Default to DataGenerator.GEN_DATA_INFO_FILE_NAME if info_file is empty/missing
-        info_file = info_file or DataGenerator.GEN_DATA_INFO_FILE_NAME
+        data_generation_config_directory = path_to_data_generation_config_directory or None
+        if data_generation_config_directory == None:
+            data_generation_config_directory = os.getcwd()
+            logger.info(f"{class_name}.{method_name}(): data generation config directory argument is NONE.  Using{data_generation_config_directory}")
+
+        data_generation_output_directory = path_to_data_generation_output_directory or None
+        if data_generation_output_directory == None:
+            data_generation_output_directory = os.getcwd()
+            logger.info(f"{class_name}.{method_name}(): output directory is NONE.  Using {data_generation_output_directory}")
+
+        ### Default to SADataGenerator.GEN_DATA_INFO_FILE_NAME if info_file is empty/missing
+        data_generation_config_file = os.path.join(data_generation_config_directory, SADataGenerator.GEN_DATA_INFO_FILE_NAME)
+
+        logger.info(f"{class_name}.{method_name}(): data generation config file: {data_generation_config_file}")
 
         ### Read the metadata csv file
         try:
-            info_df = pd.read_csv(info_file, 
+            info_df = pd.read_csv(data_generation_config_file, 
                                   header=None, 
-                                  names=[DataGenerator.GEN_DATA_INFO_DATA_TYPE_COLUMN_NAME, 
-                                         DataGenerator.GEN_DATA_INFO_SAMPLE_SIZE_COLUMN_NAME, 
-                                         DataGenerator.GEN_DATA_INFO_OUTPUT_FILE_COLUMN_NAME])
+                                  names=[SADataGenerator.GEN_DATA_INFO_DATA_TYPE_COLUMN_NAME, 
+                                         SADataGenerator.GEN_DATA_INFO_SAMPLE_SIZE_COLUMN_NAME, 
+                                         SADataGenerator.GEN_DATA_INFO_OUTPUT_FILE_COLUMN_NAME])
         except FileNotFoundError:
-            print(f"Error: File '{info_file}' not found.")
+            print(f"Error: File '{data_generation_config_file}' not found.")
             return []
         
         results = []
         
         # Process each row in metadata file, gen_data_info
         for _, row in info_df.iterrows():
-            dataset_type = row[DataGenerator.GEN_DATA_INFO_DATA_TYPE_COLUMN_NAME]
-            sample_size = row[DataGenerator.GEN_DATA_INFO_SAMPLE_SIZE_COLUMN_NAME]
-            output_file = row[DataGenerator.GEN_DATA_INFO_OUTPUT_FILE_COLUMN_NAME].strip()
+            dataset_type = row[SADataGenerator.GEN_DATA_INFO_DATA_TYPE_COLUMN_NAME]
+            sample_size = row[SADataGenerator.GEN_DATA_INFO_SAMPLE_SIZE_COLUMN_NAME]
+            output_file_name = row[SADataGenerator.GEN_DATA_INFO_OUTPUT_FILE_COLUMN_NAME].strip()
             
+            output_file = os.path.join(data_generation_output_directory, output_file_name)
+
             # Validate dataset type
             if dataset_type not in self.dataset_map:
                 print(f"Error: Invalid dataset type '{dataset_type}' for {output_file}. Skipping.")
@@ -117,7 +143,7 @@ class DataGenerator:
             print("Label counts:\n", label_counts)
             
             # Ensure enough rows for each label (50% split)
-            half_size = sample_size // DataGenerator.HALF_SIZE
+            half_size = sample_size // SADataGenerator.HALF_SIZE
             
             # Filter available rows based on used indices if ensure_uniqueness_across_same_dataset_type is True
             if ensure_uniqueness_across_same_dataset_type:
@@ -144,9 +170,9 @@ class DataGenerator:
             else:
                 ### Do not shuffle sample, use the same seed for each call to this method so the row "sampling" from each label is the same
                 sample_1 = available_df[available_df[KaggleDataSet.get_kaggle_polarity_column_name()] == KaggleDataSet.get_kaggle_polarity_value_1()].sample(
-                    n=half_size, random_state=DataGenerator.RANDOMIZE_STATE_VAL)
+                    n=half_size, random_state=SADataGenerator.RANDOMIZE_STATE_VAL)
                 sample_2 = available_df[available_df[KaggleDataSet.get_kaggle_polarity_column_name()] == KaggleDataSet.get_kaggle_polarity_value_2()].sample(
-                    n=half_size, random_state=DataGenerator.RANDOMIZE_STATE_VAL)
+                    n=half_size, random_state=SADataGenerator.RANDOMIZE_STATE_VAL)
 
             # Combine the samples
             downsampled_df = pd.concat([sample_1, sample_2])
@@ -162,7 +188,8 @@ class DataGenerator:
             
             # Save to CSV file
             downsampled_df.to_csv(output_file, index=False, header=False)
-            
+            logger.info(f"{class_name}.{method_name}(): Generating: {output_file}")
+        
             # Update used indices if ensure_unique is True
             if ensure_uniqueness_across_same_dataset_type:
                 self.used_indices[dataset_type].update(sample_1.index)

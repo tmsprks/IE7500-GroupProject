@@ -15,9 +15,9 @@ class KaggleDataLoader:
         # Download latest version
         path = kagglehub.dataset_download(self.kaggle_path)
 
-        print("Path to dataset files:", path)
-        print(path)
-        print(os.listdir(path))
+        ###print("Path to dataset files:", path)
+        ###print(path)
+        ###print(os.listdir(path))
 
         train_path = path+"\\train.csv"
         test_path = path+"\\test.csv"

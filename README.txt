@@ -3,6 +3,7 @@ README for Sentiment Analysis of 3.6M Amazon Reviews, IE 7500, Summer 2025, Grou
 README.md      - markdown README
 README.txt     - this README file
 SA-NLP.ipynb   - Jupyter notebook containing EDAs
+benchmark/     - benchmark information
 checkpoint/    - model checkpoint files
 config/        - application, model configuration files
 data/          - CSV files generated from the original Amazon review Kaggle dataset.

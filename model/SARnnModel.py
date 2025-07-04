@@ -140,7 +140,7 @@ class SARnnModel(SASentimentModel):
         logger.info(f"{class_name}.{method_name}(): Checkpoint dir: {checkpoint_dir}.   Checkpoint path: {checkpoint_file_prefix}")
 
         checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
-            filepath=checkpoint_file_prefix + 'model_checkpoint_epoch{epoch:02d}_valacc{val_accuracy:.4f}.keras',
+            filepath=checkpoint_file_prefix + 'model_checkpoint_epoch{epoch:02d}_valacc{val_accuracy:.4f}.keras', ### can either be .h5 or .keras for file extension
             monitor='val_accuracy',
             save_best_only=False, ### Saves every epoch
             save_weights_only=False, ### Saves entire model
@@ -165,13 +165,12 @@ class SARnnModel(SASentimentModel):
         ### Since retrieving best_epoch and best_val_acc is for informational purposes, we can put
         ### a try block around this code and continue with the pipeline if the code raises and exception
         ###
-        try:
-            ### Logs best validation accurary
+        if self.history and hasattr(self.history, "epoch") and self.history.history.get("val_accuracy"):
             best_epoch = max(self.history.epoch) + 1
             best_val_acc = max(self.history.history['val_accuracy'])
             logger.info(f"Best val_accuracy: {best_val_acc:.4f} at epoch {best_epoch}")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        else:
+            logger.info("No training history available. Skipping best epoch.")
 
 
         logger.info(f"{class_name}.{method_name}(): Model fitted")

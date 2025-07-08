@@ -4,6 +4,8 @@ import logging
 import inspect
 
 import tensorflow as tf
+
+from keras.saving import register_keras_serializable
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.metrics import accuracy_score, f1_score, classification_report
@@ -15,25 +17,13 @@ from utils.sa_model_config_loader import SAModelConfigLoader
 from utils.sa_data_loader import SADataLoader
 from utils.sa_model_params import SAModelParams
 from utils.sa_app_config import SAAppConfig
+from utils.sa_model_inference import SAModelInference
+from model.SASelfAttentionLayer import SASelfAttentionLayer
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-class SASelfAttentionLayer(tf.keras.layers.Layer):
-    def __init__(self, units):
-        super(SASelfAttentionLayer, self).__init__()
-        self.units = units
-        self.W = tf.keras.layers.Dense(units)
-        self.V = tf.keras.layers.Dense(1)
-
-    def call(self, inputs):
-        score = self.V(tf.nn.tanh(self.W(inputs)))
-        attention_weights = tf.nn.softmax(score, axis=1)
-        context_vector = attention_weights * inputs
-        context_vector = tf.reduce_sum(context_vector, axis=1)
-        ###return context_vector, attention_weights
-        return context_vector
 
 class SASelfAttentionModel(SASentimentModel):
 
@@ -101,6 +91,15 @@ class SASelfAttentionModel(SASentimentModel):
         self.y_val = model_params.get_validation_df()[KaggleDataSet.get_polarity_column_name()]
         self.X_test = model_params.get_test_df()
         self.y_test = model_params.get_test_df()[KaggleDataSet.get_polarity_column_name()]
+
+        ########################################################################
+        ###
+        ### NOTE: Right below we will create a TextVectorization component for the NN.
+        ###       Therefore, we don't really need to create a tokenizer & pad sequences to train the model
+        ###       because TextVectorization will handle any string input dynamically 
+        ###       and create the correct sequencing for the network
+        ###       Keeping all this code for now in case we want to remove the TextVectorization component
+        ###
         self.tokenizer.fit_on_texts(self.X_train)
         self.X_train_seq = self.tokenizer.texts_to_sequences(self.X_train)
         self.X_val_seq = self.tokenizer.texts_to_sequences(self.X_val)
@@ -108,8 +107,12 @@ class SASelfAttentionModel(SASentimentModel):
         self.X_train_pad = pad_sequences(self.X_train_seq, maxlen=self.sequence_length, padding='post')
         self.X_val_pad = pad_sequences(self.X_val_seq, maxlen=self.sequence_length, padding='post')
         self.X_test_pad = pad_sequences(self.X_test_seq, maxlen=self.sequence_length, padding='post')
+        ###
+        ########################################################################
 
-        ### Create the TextVectorization layer
+        ###
+        ### Create the TextVectorization component for the NN
+        ###
         self.vectorize_layer = tf.keras.layers.TextVectorization(max_tokens=self.max_features,
                                                                  output_mode='int',
                                                                  output_sequence_length=self.sequence_length)
@@ -126,6 +129,7 @@ class SASelfAttentionModel(SASentimentModel):
 
         self.model = tf.keras.Sequential([
             ### TextVectorization layer to convert text to integer sequences
+            ### Be sure that we are passing string as input to the NN instead of preprocessed/tokenized sequences
             ### Input: (batch_size, 1), Output: (batch_size, sequence_length=100 from above)
             self.vectorize_layer,  
 
@@ -162,14 +166,17 @@ class SASelfAttentionModel(SASentimentModel):
         logger.info(f"Calling {class_name}.{method_name}(): Model compiled")
 
         logger.info(f"Calling {class_name}.{method_name}(): Fitting model: X_train: {len(self.X_train)}, y_train: {len(self.y_train)}, X_val: {len(self.X_val)}, y_val: {len(self.y_val)},")
+
+        ###
+        ### NOTE:  Since we are utilizing a TextVectorizer in the NN, be sure to pass X_train.values rather than any preprocessed/tokenized data like X_test_pad, etc
+        ###
         self.history = self.model.fit(x=self.X_train[KaggleDataSet.get_review_column_name()].values, 
                                       y=self.y_train.values, 
                                       validation_data=(self.X_val[KaggleDataSet.get_review_column_name()].values, self.y_val.values), 
                                       epochs=int(sa_model_param.get_model_param("epoch")),  
                                       batch_size=int(sa_model_param.get_model_param("batch_size")), 
                                       verbose=1)
-        logger.info(f"Calling {class_name}.{method_name}(): Model fitted")
-        logger.info(f"{class_name}.{method_name}(): Completed")
+        logger.info(f"{class_name}.{method_name}(): Model fitted.")
 
 
     def predict(self, sa_model_param:SAModelParams=None) -> None:    
@@ -183,6 +190,35 @@ class SASelfAttentionModel(SASentimentModel):
         print(classification_report(self.y_test.values, self.result))
         logger.info(f"{class_name}.{method_name}(): Completed")
 
+    def inference(self, text_to_make_prediction_on: str=None) -> SAModelInference:
+        class_name = self.__class__.__name__
+        method_name = inspect.currentframe().f_code.co_name
+        logger.info(f"Calling {class_name}.{method_name}(): {super().get_model_params()}, '{text_to_make_prediction_on}'")
+
+        ###
+        ### Pass the text_to_make_prediction_on to the model's predict method without any preprocessing/tokenization
+        ### since we have a TextVectorization component in the network that will take care of preprocessing, 
+        ### tokenization and sequencing of the text to the appropriate padding, sequence length, etc
+        ###
+        ### Using p.array([text_to_make_prediction_on], dtype=object) because the tensorflow.keras layer expects a list of text
+        ###
+        y_pred = self.model.predict(np.array([text_to_make_prediction_on], dtype=object), verbose=0)
+        result = (y_pred > 0.5).astype(int)
+
+        ###
+        ### Confirm the shape is what you expected from the model's output layer because we need to extract the prediction and result
+        ###
+        print("Y_pred shape: ", y_pred.shape)
+        print("result shape: ", result.shape)
+
+        ###
+        ### Use shape agnostic y_pred.item() instead of double indexing in this case like y_pred[0][0] or result[0][0]
+        ### to access the actual raw prediction and interpreted value
+        ###
+        return_value = SAModelInference(text_to_make_prediction_on, y_pred.item(), result.item())
+
+        logger.info(f"{class_name}.{method_name}(): Prediction: '{text_to_make_prediction_on}' is {result[0][0]}, raw pred is {y_pred[0][0]}")
+        return return_value
 
     def evaluate(self, sa_model_param:SAModelParams=None) -> None:
         class_name = self.__class__.__name__
@@ -205,3 +241,32 @@ class SASelfAttentionModel(SASentimentModel):
         self.model.summary ()
         logger.info(f"{class_name}.{method_name}(): Completed")
 
+
+    def save(self) -> None:
+        ### Save keras model to checkpoint
+
+        module_name = inspect.getmodule(inspect.currentframe()).__name__
+        class_name = self.__class__.__name__
+        self.model.save(super().get_checkpoint_file_name(module_name, class_name))
+
+
+    def load(self) -> None:
+        ###
+        ### Loads keras model from checkpoint
+        ###
+        module_name = inspect.getmodule(inspect.currentframe()).__name__
+        class_name = self.__class__.__name__
+        method_name = inspect.currentframe().f_code.co_name
+        logger.info(f"{class_name}.{method_name}(): {super().get_app_config()}")    
+
+        model_checkpoint_path = super().get_checkpoint_file_name(module_name, class_name)
+        logger.info(f"{class_name}.{method_name}(): Loading model from {model_checkpoint_path}")    
+
+        ### 
+        ### Load the model using the model_checkpoint_path and DO NOT RECOMPILE the model again
+        ###
+        self.model = tf.keras.models.load_model(model_checkpoint_path, 
+                                                compile=False)
+        ###                                        custom_objects={"SASelfAttentionLayer": SASelfAttentionLayer})
+
+        logger.info(f"{class_name}.{method_name}(): Model loaded successfully from {model_checkpoint_path}")    

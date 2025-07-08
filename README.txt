@@ -17,5 +17,16 @@ utils/         - utility and helper classes
 
 ====================================================================
 
-- For EDA of the Amazon Reviews data, please run SA-NLP.ipynb
-- For a complete run of all the models, please run "python test/test_model_pipeline.py" from the project root directory
+* For EDA of the Amazon Reviews data, please run the Jupyter notebook SA-NLP.ipynb
+
+* For a complete training/validation/testing run of all the models, please run "python test/test_model_pipeline.py" from the project root directory.
+  This test driver produces a summary of all the models' training/validation/testing metrics/performance numbers
+
+* For testing the inference capability of a single model, please run "python test/test_single_model_pipeline_inference.py"
+  The test driver runs the model inference pipeline of one of the model.  
+  The test driver does not run the entire model pipeline from preprocessing to fit to evaluate.  
+  Instead, the model's saved and trained state is loaded and then the model runs inference.
+  This saves enormous compute and time.
+
+* For testing the inference capability of a single model without using the model pipeline, please run "python test/test_single_model_inference.py"
+  This test driver loads the specific model's saved state and then runs the model inference.

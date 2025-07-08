@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import logging
 import inspect
+
 from utils.sa_model_config import SAModelConfig
 from utils.sa_app_config import SAAppConfig
 from utils.sa_data_generator import SADataGenerator
@@ -72,11 +73,14 @@ class SAModelConfigLoader:
         model_config_file = os.path.join(model_config_directory, SAModelConfig.get_default_model_config_file_name())
         logger.info(f"{class_name}.{method_name}(): model config file: {model_config_file}")
 
-        ### Read the model config csv file
+        ### Read the model config csv file, skipping any rows starting with a "#"
         try:
+
             model_config_df = pd.read_csv(model_config_file, 
-                                          header=None, 
-                                          names=SAModelConfig.get_model_config_column_names())
+                                header=None, 
+                                names=SAModelConfig.get_model_config_column_names(),
+                                comment='#')
+
         except FileNotFoundError:
             print(f"Error: File '{model_config_file}' not found.")
             return []

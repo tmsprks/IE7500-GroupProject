@@ -3,7 +3,6 @@ import importlib
 import logging
 import inspect
 
-from utils.sa_model_config import SAModelConfig
 from utils.sa_model_params import SAModelParams
 from utils.sa_data_loader import SADataLoader
 from utils.kaggle_dataset import KaggleDataSet
@@ -11,7 +10,9 @@ from utils.sa_model_config_loader import SAModelConfigLoader
 from utils.sa_app_config import SAAppConfig
 from utils.sa_app_config_loader import SAAppConfigLoader
 from utils.sa_model_params_factory import SAModelParamsFactory
+from utils.sa_model_inference import SAModelInference
 from model.SASentimentModel import SASentimentModel
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -121,3 +122,19 @@ class SAModelPipeline:
 
         except Exception as e:
             logger.error(f"Error running model: {sa_sentiment_model.__class__.__name__}: {str(e)}")
+
+    def load_single_model (self, 
+                           model_module_name:str,
+                           model_class_name:str) -> None:
+
+        sa_sentiment_model = self.map_of_instantiated_models.get(self._model_lookup_key(model_module_name, model_class_name))
+        return sa_sentiment_model.load()
+
+    def run_single_model_inference(self, 
+                                   model_module_name:str,
+                                   model_class_name:str,
+                                   text_to_make_prediction_on: str) -> SAModelInference:
+
+        sa_sentiment_model = self.map_of_instantiated_models.get(self._model_lookup_key(model_module_name, model_class_name))
+        return sa_sentiment_model.inference(text_to_make_prediction_on)
+

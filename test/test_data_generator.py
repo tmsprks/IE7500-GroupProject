@@ -6,16 +6,6 @@ import pprint
 # Add project/ to sys.path (parent of test/)
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_dir)
-print("Current working directory:", os.getcwd())
-print("sys.path:", sys.path)
-print("Project directory added:", project_dir)
-
-# Debug utils import
-try:
-    import utils
-    print("utils package found at:", utils.__file__)
-except ImportError as e:
-    print("Import error for utils:", e)
 
 from utils.sa_app_config_loader import SAAppConfigLoader
 from utils.sa_app_config import SAAppConfig
@@ -38,7 +28,7 @@ print("Train label count:\n", train_label_count)
 print("Test label count:\n", test_label_count)
 
 sa_app_config_loader = SAAppConfigLoader()
-sa_app_config = SAAppConfigLoader().get_app_config()
+sa_app_config = sa_app_config_loader.get_app_config()
 sa_data_factory = SADataFactory(kaggle_dataset)   
 generator = SADataGenerator(sa_data_factory)
 

@@ -20,6 +20,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 ###logger.setLevel(logging.CRITICAL)
 
+###
+### SAxyzBERTSentimentModel implements the pre-trained model defined in the model config file
+### Ex: prajjwal1/bert-mini or prajjwal1/bert-tiny or other HF pre-trained-BERT model
+###
+
 class SAxyzBERTSentimentModel(SASentimentModel):
     _SA_MODEL_PARAMS_LIST = ["max_seq_length", "epoch", "batch_size", "pretrained_BERT_model", "learning_rate"]
 

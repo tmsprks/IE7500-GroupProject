@@ -5,15 +5,12 @@ import numpy as np
 import logging
 import inspect
 
+### Simple light weight Python UI toolkit
 import gradio as gr
 
 # Add project/ to sys.path (parent of test/)
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_dir)
-###print("Current working directory:", os.getcwd())
-###print("sys.path:", sys.path)
-###print("Project directory added:", project_dir)
-
 
 from framework.sa_model_pipeline import SAModelPipeline
 from utils.sa_model_config_loader import SAModelConfigLoader
@@ -46,6 +43,9 @@ def infer_sentiment_with_color_bar(review, model_choice):
     model = map_of_models.get(model_config.get_model_module_name() + ":" + model_config.get_model_class_name(), None)
     logger.info(f"\n\nModel selected {model_choice}, model found? {model}")    
 
+    ###
+    ### If the user have not selected this model for inference before, then load the pre-trained model
+    ###
     if model == None:
         logger.info(f"Model selected {model_choice}, model NOT FOUND.  Loading model {model_config}")    
 
@@ -53,6 +53,9 @@ def infer_sentiment_with_color_bar(review, model_choice):
                                                     model_config.get_model_class_name())
         map_of_models[model_config.get_model_module_name() + ":" + model_config.get_model_class_name()] = model
     
+    ###
+    ### Ask the model to infer the review
+    ###
     sa_model_inference = model.inference(review)
 
     confidence = sa_model_inference.get_raw_prediction_value()

@@ -5,9 +5,6 @@ import logging
 # Add project/ to sys.path (parent of test/)
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_dir)
-###print("Current working directory:", os.getcwd())
-###print("sys.path:", sys.path)
-###print("Project directory added:", project_dir)
 
 from utils.sa_app_config_loader import SAAppConfigLoader
 from utils.sa_model_params_factory import SAModelParamsFactory
@@ -43,8 +40,6 @@ def main():
     ##model_class_name = "SASelfAttentionModel"
     model_module_name = "SAxyzBERTSentimentModel"
     model_class_name = "SAxyzBERTSentimentModel"
-    ###model_module_name = "SADistilBERTSentimentModel"
-    ###model_class_name = "SADistilBERTSentimentModel"
 
     ### Construct the model parameter object
     sa_model_params = SAModelParamsFactory.create_model_params(model_module_name, model_class_name)

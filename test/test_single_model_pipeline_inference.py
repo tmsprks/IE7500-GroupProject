@@ -5,9 +5,6 @@ import logging
 # Add project/ to sys.path (parent of test/)
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(project_dir)
-###print("Current working directory:", os.getcwd())
-###print("sys.path:", sys.path)
-###print("Project directory added:", project_dir)
 
 print("Importing modules.")
 

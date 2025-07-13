@@ -129,5 +129,7 @@ class SAModelConfigLoader:
             if found:
                 return_value = model_config
             i += 1
-        
+
+        logger.info(f"{class_name}.{method_name}(): Found [{model_module_name}.{model_class_name}] ?, {return_value}")
+
         return return_value

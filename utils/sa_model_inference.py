@@ -36,7 +36,7 @@ class SAModelInference:
         logger.info(f"{class_name}.{method_name}(): '{self.prediction_text}', {self.raw_prediction}, {self.interpreted_prediction}")       
 
     def __str__(self):
-        return f"'{self.get_prediction_text()}', {self.get_raw_prediction_value()} -> {SAModelInference.interpret_pred_value_to_string_value(self.get_interpreted_prediction())}"
+        return f"'{self.get_prediction_text()}', {self.get_raw_prediction_value()} -> {self.get_interpreted_prediction_str_value()}"
     
     def get_prediction_text(self) -> str:
         return self.prediction_text
@@ -46,3 +46,6 @@ class SAModelInference:
     
     def get_interpreted_prediction(self) -> int:
         return self.interpreted_prediction
+    
+    def get_interpreted_prediction_str_value(self) -> str:
+        return SAModelInference.interpret_pred_value_to_string_value(self.get_interpreted_prediction())

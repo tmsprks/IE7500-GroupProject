@@ -1,12 +1,6 @@
 import os
 import sys
-import numpy as np
 import logging
-import inspect
-import tensorflow as tf
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from sklearn.metrics import accuracy_score, f1_score
 
 # Add project/ to sys.path (parent of test/)
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -15,16 +9,10 @@ sys.path.append(project_dir)
 ###print("sys.path:", sys.path)
 ###print("Project directory added:", project_dir)
 
-from model.SASelfAttentionModel import SASelfAttentionModel
-from model.SASentimentModel import SASentimentModel
-from utils.kaggle_dataset import KaggleDataSet
-from framework.sa_model_pipeline import SAModelPipeline
-from utils.sa_model_config_loader import SAModelConfigLoader
-from utils.sa_data_loader import SADataLoader
-from utils.sa_model_params import SAModelParams
+
 from utils.sa_app_config_loader import SAAppConfigLoader
 from utils.sa_model_params_factory import SAModelParamsFactory
-from utils.sa_model_inference import SAModelInference
+from model.SAxyzBERTSentimentModel import SAxyzBERTSentimentModel
 
 print("Imported all modules successfully")
 
@@ -52,9 +40,13 @@ def main():
     ### Modify model_module_name and model_class_name to match your model's 
     ### module and class name and then change the model instance to match your model class below
     ###
-    model_module_name = "SASelfAttentionModel"
-    model_class_name = "SASelfAttentionModel"
-
+    ###model_module_name = "SASelfAttentionModel"
+    ###model_class_name = "SASelfAttentionModel"
+    ###model_module_name = "SADistilBERTSentimentModel"
+    ###model_class_name = "SADistilBERTSentimentModel"
+    model_module_name = "SAxyzBERTSentimentModel"
+    model_class_name = "SAxyzBERTSentimentModel"
+    
     ### Construct the model parameter object
     sa_model_params = SAModelParamsFactory.create_model_params(model_module_name, model_class_name)
 
@@ -64,8 +56,7 @@ def main():
     ### CHANGE THE MODEL TO YOUR MODEL CLASS!!
     ### 
 
-    sa_sentiment_model = SASelfAttentionModel(SAAppConfigLoader().get_app_config(),
-                                              sa_model_params)
+    sa_sentiment_model = SAxyzBERTSentimentModel(SAAppConfigLoader().get_app_config(), sa_model_params)
     
     ###
     ###

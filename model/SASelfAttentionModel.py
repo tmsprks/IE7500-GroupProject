@@ -12,9 +12,6 @@ from sklearn.metrics import accuracy_score, f1_score, classification_report
 
 from model.SASentimentModel import SASentimentModel
 from utils.kaggle_dataset import KaggleDataSet
-
-from utils.sa_model_config_loader import SAModelConfigLoader
-from utils.sa_data_loader import SADataLoader
 from utils.sa_model_params import SAModelParams
 from utils.sa_app_config import SAAppConfig
 from utils.sa_model_inference import SAModelInference
@@ -37,7 +34,8 @@ class SASelfAttentionModel(SASentimentModel):
                                             "embedding_dim",
                                             "max_features",
                                             "epoch",
-                                            "batch_size"]
+                                            "batch_size",
+                                            "chkpt_file_ext"]
     
     def __init__(self, 
                  sa_app_config: SAAppConfig,
@@ -63,6 +61,7 @@ class SASelfAttentionModel(SASentimentModel):
         self.X_val_pad = None
         self.X_test_pad = None
         self.model = None
+        self.chkpt_file_name_extension = model_params.get_model_param("chkpt_file_ext")
 
     def register(self, sa_model_param:SAModelParams=None) -> str:
         class_name = self.__class__.__name__
@@ -208,8 +207,8 @@ class SASelfAttentionModel(SASentimentModel):
         ###
         ### Confirm the shape is what you expected from the model's output layer because we need to extract the prediction and result
         ###
-        print("Y_pred shape: ", y_pred.shape)
-        print("result shape: ", result.shape)
+        ###print("Y_pred shape: ", y_pred.shape)
+        ###print("result shape: ", result.shape)
 
         ###
         ### Use shape agnostic y_pred.item() instead of double indexing in this case like y_pred[0][0] or result[0][0]
@@ -217,7 +216,7 @@ class SASelfAttentionModel(SASentimentModel):
         ###
         return_value = SAModelInference(text_to_make_prediction_on, y_pred.item(), result.item())
 
-        logger.info(f"{class_name}.{method_name}(): Prediction: '{text_to_make_prediction_on}' is {result[0][0]}, raw pred is {y_pred[0][0]}")
+        logger.info(f"{class_name}.{method_name}(): Prediction is {result.item()}, raw pred is {y_pred.item()}")
         return return_value
 
     def evaluate(self, sa_model_param:SAModelParams=None) -> None:
@@ -231,7 +230,7 @@ class SASelfAttentionModel(SASentimentModel):
             verbose=1             
         )
         logger.info(f"{class_name}.{method_name}(): Completed")
-
+ 
 
     def summary(self, sa_model_param:SAModelParams=None) -> None:
         class_name = self.__class__.__name__
@@ -247,7 +246,7 @@ class SASelfAttentionModel(SASentimentModel):
 
         module_name = inspect.getmodule(inspect.currentframe()).__name__
         class_name = self.__class__.__name__
-        self.model.save(super().get_checkpoint_file_name(module_name, class_name))
+        self.model.save(super().get_checkpoint_file_name(module_name, class_name, self.chkpt_file_name_extension))
 
 
     def load(self) -> None:
@@ -259,7 +258,7 @@ class SASelfAttentionModel(SASentimentModel):
         method_name = inspect.currentframe().f_code.co_name
         logger.info(f"{class_name}.{method_name}(): {super().get_app_config()}")    
 
-        model_checkpoint_path = super().get_checkpoint_file_name(module_name, class_name)
+        model_checkpoint_path = super().get_checkpoint_file_name(module_name, class_name, self.chkpt_file_name_extension)
         logger.info(f"{class_name}.{method_name}(): Loading model from {model_checkpoint_path}")    
 
         ### 
@@ -267,6 +266,5 @@ class SASelfAttentionModel(SASentimentModel):
         ###
         self.model = tf.keras.models.load_model(model_checkpoint_path, 
                                                 compile=False)
-        ###                                        custom_objects={"SASelfAttentionLayer": SASelfAttentionLayer})
-
+        
         logger.info(f"{class_name}.{method_name}(): Model loaded successfully from {model_checkpoint_path}")    

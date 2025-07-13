@@ -125,10 +125,11 @@ class SAModelPipeline:
 
     def load_single_model (self, 
                            model_module_name:str,
-                           model_class_name:str) -> None:
+                           model_class_name:str) -> SASentimentModel:
 
         sa_sentiment_model = self.map_of_instantiated_models.get(self._model_lookup_key(model_module_name, model_class_name))
-        return sa_sentiment_model.load()
+        sa_sentiment_model.load()
+        return sa_sentiment_model
 
     def run_single_model_inference(self, 
                                    model_module_name:str,

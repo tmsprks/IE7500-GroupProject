@@ -13,8 +13,6 @@ print("Importing modules.")
 
 from framework.sa_model_pipeline import SAModelPipeline
 from utils.sa_app_config_loader import SAAppConfigLoader
-from utils.sa_model_config_loader import SAModelConfigLoader
-from utils.sa_model_inference import SAModelInference
 
 print("Imported all modules successfully")
 
@@ -28,6 +26,8 @@ sa_model_pipeline = SAModelPipeline(sa_app_config_loader.get_app_config())
 
 model_module_name = "SASelfAttentionModel"
 model_class_name = "SASelfAttentionModel"
+###model_module_name = "SAxyzBERTSentimentModel"
+###model_class_name = "SAxyzBERTSentimentModel"
 
 ###
 ### First we load the model.

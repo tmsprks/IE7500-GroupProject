@@ -8,7 +8,6 @@ sys.path.append(project_dir)
 
 from framework.sa_model_pipeline import SAModelPipeline
 from utils.sa_app_config_loader import SAAppConfigLoader
-from utils.sa_model_config_loader import SAModelConfigLoader
 
 print("Imported all utils modules successfully")
 

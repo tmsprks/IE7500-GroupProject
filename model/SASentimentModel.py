@@ -46,7 +46,7 @@ class SASentimentModel(ABC):
         pass
 
     @abstractmethod
-    def inference (self, text_to_make_prediction_on: str=None) -> SAModelInference:
+    def inference (self, text_to_make_prediction_on: str) -> SAModelInference:
         """Predict the sentiment of the parameter text_to_make_prediction_on."""
         pass
 
@@ -105,7 +105,20 @@ class SASentimentModel(ABC):
 
         return model_checkpoint_path
     
+    def get_checkpoint_directory(self,
+                                 model_module_name: str,
+                                 model_class_name: str) -> str:
+        class_name = self.__class__.__name__
+        method_name = inspect.currentframe().f_code.co_name
+        logger.info(f"{class_name}.{method_name}(): {self.get_app_config()}")    
 
+        clean_module_name = model_module_name.removeprefix("model.")
+        sa_model_checkpoint_util = SAModelCheckpointUtil(self.get_app_config())
+        model_checkpoint_path = sa_model_checkpoint_util.get_checkpoint_directory(clean_module_name, model_class_name)
+
+        logger.info(f"{class_name}.{method_name}(): Checkpoint file name: {model_checkpoint_path}")  
+
+        return model_checkpoint_path
     ###
     ### Run the model pipeline
     ###

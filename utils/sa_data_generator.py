@@ -109,13 +109,15 @@ class SADataGenerator:
 
         logger.info(f"{class_name}.{method_name}(): data generation config file: {data_generation_config_file}")
 
-        ### Read the metadata csv file
+        ### Read the metadata csv file.  
+        ### Support commenting out of any rows in the config file using "#"
         try:
             info_df = pd.read_csv(data_generation_config_file, 
                                   header=None, 
                                   names=[SADataGenerator.GEN_DATA_INFO_DATA_TYPE_COLUMN_NAME, 
                                          SADataGenerator.GEN_DATA_INFO_SAMPLE_SIZE_COLUMN_NAME, 
-                                         SADataGenerator.GEN_DATA_INFO_OUTPUT_FILE_COLUMN_NAME])
+                                         SADataGenerator.GEN_DATA_INFO_OUTPUT_FILE_COLUMN_NAME],
+                                  comment='#')
         except FileNotFoundError:
             print(f"Error: File '{data_generation_config_file}' not found.")
             return []

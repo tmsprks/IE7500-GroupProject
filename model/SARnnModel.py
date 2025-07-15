@@ -24,17 +24,22 @@ class SARnnModel(SASentimentModel):
                               "sequence_length",
                               "embedding_dim",
                               "epoch",
-                              "batch_size"]
+                              "batch_size",
+                              "learning_rate",
+                              "chkpt_file_ext"
+                              ]
 
     def __init__(self, 
-                 sa_app_config: SAAppConfig,
-                 model_params: SAModelParams):
+                sa_app_config: SAAppConfig,
+                model_params: SAModelParams):
         super().__init__(sa_app_config, model_params)
         self.vocab_size = int(model_params.get_model_param("vocab_size"))
         self.sequence_length = int(model_params.get_model_param("sequence_length"))
         self.embedding_dim = int(model_params.get_model_param("embedding_dim"))
         self.epoch = int(model_params.get_model_param("epoch"))
         self.batch_size = int(model_params.get_model_param("batch_size"))
+        self.learning_rate = float(model_params.get_model_param("learning_rate"))
+        self.chkpt_file_ext = str(model_params.get_model_param("chkpt_file_ext"))
 
         ### Tokenizer
         self.tokenizer = Tokenizer(num_words=self.vocab_size, oov_token='<OOV>')
@@ -87,12 +92,26 @@ class SARnnModel(SASentimentModel):
             maxlen=self.sequence_length, padding='post'
         )
 
+
         logger.info(f"{class_name}.{method_name}(): Completed")
+
 
     def fit(self, sa_model_param: SAModelParams = None, resume_training=False, initial_epoch=0) -> None:
         class_name = self.__class__.__name__
         method_name = inspect.currentframe().f_code.co_name
         logger.info(f"Calling {class_name}.{method_name}(): {super().get_model_params()}")
+
+        checkpoint_base_path = self.get_checkpoint_file_name(
+            inspect.getmodule(inspect.currentframe()).__name__, self.__class__.__name__
+        ) + self.chkpt_file_ext
+
+        if os.path.exists(checkpoint_base_path):
+            logger.info(f"{class_name}.{method_name}(): Loading model from checkpoint: {checkpoint_base_path}")
+            self.model = tf.keras.models.load_model(checkpoint_base_path)
+            logger.info(f"{class_name}.{method_name}(): Model loaded successfully.")
+            return  # stops resume training
+        else:
+            logger.info(f"{class_name}.{method_name}(): No checkpoint found at {checkpoint_base_path}. Training new model..")
 
         if self.model is None:
             # builds and compiles model if nothing has been loaded from checkpoint
@@ -105,15 +124,14 @@ class SARnnModel(SASentimentModel):
                 tf.keras.layers.Dense(64, activation='relu'),
                 tf.keras.layers.Dense(1, activation='sigmoid')
             ])
-            self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-            logger.info(f"{class_name}.{method_name}(): Model compiled")
+            
+            self.model.compile(
+                optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate),
+                loss='binary_crossentropy',
+                metrics=['accuracy']
+            )
 
-            ###
-            ### Previous version of determining data directory.
-            ### Updated version  uses app config, see below
-            ###
-            ###data_directory = os.getcwd()
-            ###logger.info(f"{class_name}.{method_name}(): data directory is NONE.  Using {data_directory}")
+            logger.info(f"{class_name}.{method_name}(): Model compiled")
 
         checkpoint_dir = self.sa_app_config.model.checkpoint_dir
         checkpoint_file_prefix = os.path.join(checkpoint_dir)
@@ -143,6 +161,7 @@ class SARnnModel(SASentimentModel):
             verbose=1
         )
 
+        self.model.save(checkpoint_base_path)
         logger.info(f"{class_name}.{method_name}(): Model fitted")
 
     def predict(self, sa_model_param: SAModelParams = None) -> None:
@@ -173,7 +192,9 @@ class SARnnModel(SASentimentModel):
         method_name = inspect.currentframe().f_code.co_name
         module_name = inspect.getmodule(inspect.currentframe()).__name__
 
-        checkpoint_path = super().get_checkpoint_file_name(module_name, class_name)
+        checkpoint_path = self.get_checkpoint_file_name(
+            module_name, class_name, ".keras"
+        )
         self.model.save(checkpoint_path, save_format="keras")
         logger.info(f"{class_name}.{method_name}(): Model saved to {checkpoint_path}")
 

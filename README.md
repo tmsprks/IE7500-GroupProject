@@ -17,7 +17,7 @@ python/             - Multiple requirements.txt, Python version
 test/               - test drivers
 utils/              - utility and helper classes
 
-====================================================================
+--------------------------------------------------------------------
 
 Below are the demo applications and test drivers for this project.  Before running the demos or test drivers which showcase the project,
 please ensure you have read the README.txt under the python directory. python/README.txt contains instructions on how to install all the 

@@ -1,21 +1,21 @@
 # IE7500-GroupProject
 README for Sentiment Analysis of 3.6M Amazon Reviews, IE 7500, Summer 2025, Group 3
 
-README.md           - markdown README
-README.txt          - this README file
-SA-NLP-demo.py      - Python browser demo of the models' inference capability
-SA-NLP.ipynb        - Jupyter notebook containing EDAs
-benchmark/          - benchmark information
-checkpoint/         - model checkpoint files
-config/             - application, model configuration files
-data/               - CSV files generated from the original Amazon review Kaggle dataset.
-db/                 - SQLite DB related files for data checks, preliminary EDA
-doc/                - project docs, class and package UML diagrams
-framework/          - model pipeline framework
-model/              - various models including but not limited to LSTM, RNN, Self Attention
-python/             - Multiple requirements.txt, Python version
-test/               - test drivers
-utils/              - utility and helper classes
+- **README.md** – Markdown README  
+- **README.txt** – Text README
+- **SA-NLP-demo.py** – Python browser demo of the models' inference capability  
+- **SA-NLP.ipynb** – Jupyter notebook containing EDAs  
+- **benchmark/** – Benchmark information  
+- **checkpoint/** – Model checkpoint files  
+- **config/** – Application, model configuration files  
+- **data/** – CSV files generated from the original Amazon review Kaggle dataset  
+- **db/** – SQLite DB-related files for data checks and preliminary EDA  
+- **doc/** – Project docs, class and package UML diagrams  
+- **framework/** – Model pipeline framework  
+- **model/** – Various models including but not limited to LSTM, RNN, Self-Attention  
+- **python/** – Multiple `requirements.txt` files and Python version information  
+- **test/** – Test drivers  
+- **utils/** – Utility and helper classes
 
 --------------------------------------------------------------------
 

@@ -12,25 +12,25 @@ db/                 - SQLite DB related files for data checks, preliminary EDA
 doc/                - project docs, class and package UML diagrams
 framework/          - model pipeline framework
 model/              - various models including but not limited to LSTM, RNN, Self Attention
-python/             - Multiple requirements.txt, Python version
+python/             - Requirements.txt, Python version
 test/               - test drivers
 utils/              - utility and helper classes
 
 ====================================================================
 
 Below are the demo applications and test drivers for this project.  Before running the demos or test drivers which showcase the project,
-please ensure you have read the README.txt under the python directory. python/README.txt contains instructions on how to install all the 
-project's required packages.  Afterward, ensure you are either in the virtual or real environment that the requirements are installed
-before running the demo, EDA application or the test drivers.
-
-Thank you for your time and interest.  IE 7500, Summer 2025, Group 03.
+please ensure, under the root of the project's git repo, you use python/requirements.txt to install all the project's required libraries.
+Then ensure you are either in the virtual environment that the requirements are installed or in the environment the requirements are installed.
+The requirements.txt file may contain platform specific packages that may not be applicable to your platform, i.e., Windows specific packages.
+We try our best to eliminate these packages from requirements.txt but due to IDEs, development tools, they may exists in requirements.txt.
+Thank you for your time and interest.  IE 7500, Group 03.
 
 --------------------------------------------------------------------
 
-* For a demo of the models and their inference capability, run from project roo, "python SA-NLP-demo.py", then point your browser to "http://127.0.0.1:7860"
+* For a demo of the models and their inference capability, run "python SA-NLP-demo.py", then point your browser to "http://127.0.0.1:7860"
   In case the web server address changes, look for the output after starting SA-NLP-demo.py, "* Running on local URL:  http://127.0.0.1:7860"
   In this demo, you can copy/paste or write a review, then pick the available models the team have developed and press the "Infer" button to
-  see the various models' inference-in-action.   This demo showcase (1) the different trained and fine-funed models (2) load/save capability
+  see the various models' inference-in-action.   This demo showcase (1) the different trained models (2) load/save capability
   (3) inference-on-demand capability.
 
 * For EDA of the Amazon Reviews data, please run the Jupyter notebook SA-NLP.ipynb

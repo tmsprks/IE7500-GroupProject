@@ -192,13 +192,15 @@ class SARnnModel(SASentimentModel):
         method_name = inspect.currentframe().f_code.co_name
         module_name = inspect.getmodule(inspect.currentframe()).__name__
 
-        checkpoint_path = self.get_checkpoint_file_name(
-            module_name, class_name, ".keras"
-        )
-        self.model.save(checkpoint_path, save_format="keras")
-        logger.info(f"{class_name}.{method_name}(): Model saved to {checkpoint_path}")
+        # base path no extension
+        base_checkpoint_path = super().get_checkpoint_file_name(module_name, class_name)
 
-        tokenizer_path = checkpoint_path + "_tokenizer.pickle"
+        keras_checkpoint_path = base_checkpoint_path + ".keras"
+
+        self.model.save(keras_checkpoint_path)
+        logger.info(f"{class_name}.{method_name}(): Model saved to {keras_checkpoint_path}")
+
+        tokenizer_path = base_checkpoint_path + "_tokenizer.pickle"
         with open(tokenizer_path, "wb") as f:
             pickle.dump(self.tokenizer, f)
         logger.info(f"{class_name}.{method_name}(): Tokenizer saved to {tokenizer_path}")
@@ -208,14 +210,16 @@ class SARnnModel(SASentimentModel):
         method_name = inspect.currentframe().f_code.co_name
         module_name = inspect.getmodule(inspect.currentframe()).__name__
 
-        checkpoint_path = super().get_checkpoint_file_name(module_name, class_name)
-        logger.info(f"{class_name}.{method_name}(): Loading model from {checkpoint_path}")
+        base_checkpoint_path = super().get_checkpoint_file_name(module_name, class_name)
+        keras_checkpoint_path = base_checkpoint_path + ".keras"
 
-        self.model = tf.keras.models.load_model(checkpoint_path, compile=False)
+        logger.info(f"{class_name}.{method_name}(): Loading model from {keras_checkpoint_path}")
+
+        self.model = tf.keras.models.load_model(keras_checkpoint_path, compile=False)
         self.model.compile(optimizer=Adam(learning_rate=0.001), loss='binary_crossentropy', metrics=['accuracy'])
         logger.info(f"{class_name}.{method_name}(): Model loaded and compiled")
 
-        tokenizer_path = checkpoint_path + "_tokenizer.pickle"
+        tokenizer_path = base_checkpoint_path + "_tokenizer.pickle"
         if os.path.exists(tokenizer_path):
             with open(tokenizer_path, "rb") as f:
                 self.tokenizer = pickle.load(f)
@@ -226,15 +230,23 @@ class SARnnModel(SASentimentModel):
     def inference(self, text_to_make_prediction_on: str = None) -> SAModelInference:
         class_name = self.__class__.__name__
         method_name = inspect.currentframe().f_code.co_name
-        logger.info(f"Calling {class_name}.{method_name}(): Predicting on: {text_to_make_prediction_on}")
+        logger.info(f"{class_name}.{method_name}(): {super().get_model_params()}")
 
-        seq = self.tokenizer.texts_to_sequences([text_to_make_prediction_on])
-        pad = pad_sequences(seq, maxlen=self.sequence_length, padding='post')
-        y_pred = self.model.predict(pad, verbose=0)
-        result = (y_pred > 0.5).astype(int)
+        # preprocess text to sequences
+        sequences = self.tokenizer.texts_to_sequences([text_to_make_prediction_on])
+        padded_seq = pad_sequences(
+            sequences, 
+            maxlen=self.sequence_length, 
+            padding='post'
+        )
+
+        # predict raw probability
+        probability = self.model.predict(padded_seq, verbose=0)[0][0]
+    
+        pred = int(probability >= 0.5)
 
         return SAModelInference(
-            text=text_to_make_prediction_on,
-            prediction=y_pred.item(),
-            result=result.item()
-        )
+            prediction_text=text_to_make_prediction_on,
+            raw_prediction=probability,
+            interpreted_prediction=pred
+    )

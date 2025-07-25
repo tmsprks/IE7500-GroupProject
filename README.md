@@ -47,7 +47,7 @@ As mentioned previously, the project will be utilizing the 4 million Amazon Revi
 
 Upon project completion, various deep learning models will be able to infer real-time reviews which the users input into the demonstration application. 
 
-Here are two examples. First is a screen shot of an actual positive Amazon review from the Amazon website:
+Here are two examples. First is a positive Amazon review from the Amazon website:
 
 [Original Amazon review](https://www.amazon.com/gp/customer-reviews/R2K8MBRGFPSZ3L)
 
@@ -55,7 +55,7 @@ Sentiment Analysis of the same Amazon review using the LSTM model:
 
 ![LSTM Amazon Review](images/demo-LSTM-pos-01.jpg)
 
-Here is the second example of an actual negative Amazon review from the Amazon webiste:
+Here is the second example. It is a negative Amazon review from the Amazon webiste:
 
 [Original Amazon review](https://www.amazon.com/gp/customer-reviews/R1RLY0GI4V94MK)
 

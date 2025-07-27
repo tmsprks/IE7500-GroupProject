@@ -85,4 +85,3 @@ The project have built a foundation for applying deep models to Sentiment Analys
   - FastAPI for web integration 
 - Multi-Language Support
   - Extend the model to support other languages besides English
-- 

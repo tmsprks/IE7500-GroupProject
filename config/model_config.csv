@@ -1,5 +1,4 @@
 Self Attention Model,SASelfAttentionModel,SASelfAttentionModel,train_60K.csv,test_50K.csv,validate_20K.csv,"vocab_size=10000,max_features=20000,sequence_length=500,embedding_dim=20000,embed_output=128,epoch=10,batch_size=32,chkpt_file_ext=.keras"
-###Test Self Attention Model,SASelfAttentionModel,SASelfAttentionModel,train_2K.csv,test_1K.csv,validate_1K.csv,"vocab_size=10000,max_features=20000,sequence_length=500,embedding_dim=20000,embed_output=128,epoch=1,batch_size=32,chkpt_file_ext=.keras"
-#MultiHead Attention Model,sa_multihead_attention_model,SA_MultiHeadAttentionModel,train_60K.csv,test_20K.csv,validate_20K.csv
-RNN Sentiment Model,SARnnModel,SARnnModel,train_500K.csv,test_100K.csv,validate_100K.csv,"vocab_size=10000,sequence_length=150,embedding_dim=100,epoch=25,batch_size=32,learning_rate=1e-4,chkpt_file_ext=.keras"
+RNN Sentiment Model,SARnnModel,SARnnModel,train_60K.csv,test_20K.csv,validate_20K.csv,"vocab_size=10000,sequence_length=150,embedding_dim=100,epoch=25,batch_size=32,learning_rate=1e-4,chkpt_file_ext=.keras"
 Mini BERT Model,SAxyzBERTSentimentModel,SAxyzBERTSentimentModel,train_60K.csv,test_50K.csv,validate_20K.csv,"max_seq_length=128,learning_rate=2e-5,epoch=5,batch_size=32,pretrained_BERT_model=prajjwal1/bert-mini"
+LSTM Sentiment Model,SALSTMModel,SALSTMModel,train_60K.csv,test_20K.csv,validate_20K.csv,"vocab_size=10000,max_features=20000,sequence_length=500,embedding_dim=20000,embed_output=128,epoch=10,batch_size=32,chkpt_file_ext=.keras"

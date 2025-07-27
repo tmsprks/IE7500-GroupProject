@@ -11,7 +11,7 @@
 <h3> Problem Statement </h3>
 </span>
 </div>
-The project seeks to apply Natural Language Processing to Sentiment Analysis of a dataset containing 4 million Amazon reviews.
+The project seeks to apply Natural Language Processing to Sentiment Analysis of a dataset containing 4 million Amazon reviews.  Upon training completion of the project's deep models, they can be used for inference on unseen Amazon reviews from the Amazon website.
 
 
 <div align="center">
@@ -45,9 +45,9 @@ As mentioned previously, the project will be utilizing the 4 million Amazon Revi
 </span>
 </div>
 
-Upon project completion, various deep learning models will be able to infer real-time reviews which the users input into the demonstration application. 
+Upon project completion, various deep learning models will be able to infer unseen Amazon reviews which the users can input into the demonstration application in real-time. 
 
-Here are two examples. First is a positive Amazon review from the Amazon website:
+Here are two examples using the demonstraton application. First example is a positive Amazon review. Here's the link to the Amazon review on Amazon:
 
 [Original Amazon review](https://www.amazon.com/gp/customer-reviews/R2K8MBRGFPSZ3L)
 
@@ -55,7 +55,7 @@ Sentiment Analysis of the same Amazon review using the LSTM model:
 
 ![LSTM Amazon Review](images/demo-LSTM-pos-01.jpg)
 
-Here is the second example. It is a negative Amazon review from the Amazon webiste:
+Here is the second example. It is a negative Amazon review on Amazon:
 
 [Original Amazon review](https://www.amazon.com/gp/customer-reviews/R1RLY0GI4V94MK)
 
@@ -63,3 +63,26 @@ Sentiment Analysis of the same Amazon review using the RNN model:
 
 ![Amazon Review](images/demo-RNN-neg-01.jpg)
 
+<div align="center">
+<span style="color: crimson; font-weight: bold;">
+<h3> Future Improvements and Considrations </h3>
+</span>
+</div>
+
+The project have built a foundation for applying deep models to Sentiment Analysis. Further exploration can include but not limited to
+
+- Multi-Class Classification.
+  - The Kaggle dataset contains only binary labels: positive or negative.
+  - The project's deep model can be retrofitted to classify multi-class labels such as positive, neutral or negative.
+- Additional Models
+  - The project have focused solely on deep models. However, depending on the use case, shallow models may be more appropriate and even preferred.  For example, interpretability and small and expertly curated dataset.  When interpretability is a priority and paramount to the problem statement, then shallow model provides a better path to explainability.  Additionally, deep models require large dataset to train to avoid overfitting.  Small, expertly curated dataset would be more suited for shallow models.
+- Ensemble Classification
+  - Combine both shallow and deep models to classify reviews.  Use a weighted (models with higher accuracy receives higher weights) result or simple voting in an ensemble approach to classify a review.
+- Domain and Context Adaption
+  - Train the project's models on other domain specific data like healthcare or fintwit (finance and market specific tweets or posts) or other e-commerce reviews.
+  - Utilizing zero-shot or few-shot learning
+- Deployment and Accessibility
+  - FastAPI for web integration 
+- Multi-Language Support
+  - Extend the model to support other languages besides English
+- 

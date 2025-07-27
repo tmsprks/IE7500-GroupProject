@@ -75,13 +75,15 @@ The project have built a foundation for applying deep models to Sentiment Analys
   - The Kaggle dataset contains only binary labels: positive or negative.
   - The project's deep model can be retrofitted to classify multi-class labels such as positive, neutral or negative.
 - Additional Models
-  - The project have focused solely on deep models. However, depending on the use case, shallow models may be more appropriate and even preferred.  For example, interpretability and small and expertly curated dataset.  When interpretability is a priority and paramount to the problem statement, then shallow model provides a better path to explainability.  Additionally, deep models require large dataset to train to avoid overfitting.  Small, expertly curated dataset would be more suited for shallow models.
+  - The project have focused solely on deep models. However, depending on the use case, shallow models may be more appropriate and even preferred.  For example, interpretability and small and expertly curated dataset.  When interpretability is a priority and paramount to the problem statement, then shallow model provides a better path to explainability.  Additionally, deep models require large dataset to train to avoid overfitting.  Small, expertly curated dataset would be more suitable for shallow models.
 - Ensemble Classification
-  - Combine both shallow and deep models to classify reviews.  Use a weighted (models with higher accuracy receives higher weights) result or simple voting in an ensemble approach to classify a review.
-- Domain and Context Adaption
-  - Train the project's models on other domain specific data like healthcare or fintwit (finance and market specific tweets or posts) or other e-commerce reviews.
+  - Combine both shallow and deep models to classify reviews.  Use a weighted (models with higher average accuracy receive higher weights) result or simple voting in an ensemble approach to classification.
+- Domain and Context Adaptation
+  - Train the models on other domain specific data like healthcare or fintwit (finance and market specific tweets or posts) or hospitality or other e-commerce reviews.
   - Utilizing zero-shot or few-shot learning
 - Deployment and Accessibility
   - FastAPI for web integration 
 - Multi-Language Support
   - Extend the model to support other languages besides English
+- Aspect-based Sentiment Analysis
+  - More granular sentiment analysis such as what aspects of the review is important?  Is it the price, the product quality, the delivery time, cheaper alternatives, customer service was terrible, etc

@@ -8,6 +8,7 @@ import tensorflow as tf
 from keras.saving import register_keras_serializable
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.regularizers import l2
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 
 from model.SASentimentModel import SASentimentModel
@@ -91,6 +92,8 @@ class SASelfAttentionModel(SASentimentModel):
         self.X_test = model_params.get_test_df()
         self.y_test = model_params.get_test_df()[KaggleDataSet.get_polarity_column_name()]
 
+        logger.info(f"{class_name}.{method_name}(): X_train: {len(self.X_train)}, y_train: {len(self.y_train)}, X_test: {len(self.X_test)}, y_test: {len(self.y_test)}, X_val: {len(self.X_val)}, y_val: {len(self.y_val)}")
+
         ########################################################################
         ###
         ### NOTE: Right below we will create a TextVectorization component for the NN.
@@ -141,9 +144,13 @@ class SASelfAttentionModel(SASentimentModel):
             ),  
 
             ### Bidirectional LSTM layer to capture sequential dependencies
+            ### Add recurrent dropout for regularization
             ### Output: (batch_size, 100, 128) (64 units × 2 for bidirectional)
             tf.keras.layers.Bidirectional(
-                tf.keras.layers.LSTM(64, return_sequences=True)
+                tf.keras.layers.LSTM(64, 
+                                     return_sequences=True,
+                                     recurrent_dropout=0.3,
+                                     dropout=0.2)
             ),  
 
             ### SelfAttention layer to compute context vector
@@ -151,20 +158,27 @@ class SASelfAttentionModel(SASentimentModel):
             SASelfAttentionLayer(units=64),  
 
             ### Dense layer with ReLU activation for feature extraction
+            ### Add L2 regularization to combat potential overfitting
             ### Output: (batch_size, 64)
-            tf.keras.layers.Dense(64, activation='relu'),  
+            tf.keras.layers.Dense(64, 
+                                  activation='relu',
+                                  kernel_regularizer=l2(0.001)),  
 
             ### Dropout layer for regularization
             ### Output: (batch_size, 64)
             tf.keras.layers.Dropout(0.5),  
 
-            tf.keras.layers.Dense(1, activation='sigmoid', name='output')  
+            ### Add L2 regularization to the final Dense layer
+            tf.keras.layers.Dense(1, 
+                                  activation='sigmoid', 
+                                  name='output',
+                                  kernel_regularizer=l2(0.001))  
         ])
 
         self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
         logger.info(f"Calling {class_name}.{method_name}(): Model compiled")
 
-        logger.info(f"Calling {class_name}.{method_name}(): Fitting model: X_train: {len(self.X_train)}, y_train: {len(self.y_train)}, X_val: {len(self.X_val)}, y_val: {len(self.y_val)},")
+        logger.info(f"Calling {class_name}.{method_name}(): Fitting model: X_train: {len(self.X_train)}, y_train: {len(self.y_train)}, X_val: {len(self.X_val)}, y_val: {len(self.y_val)}")
 
         ###
         ### NOTE:  Since we are utilizing a TextVectorizer in the NN, be sure to pass X_train.values rather than any preprocessed/tokenized data like X_test_pad, etc

@@ -76,6 +76,7 @@ class SAxyzBERTSentimentModel(SASentimentModel):
         self.y_val = self.X_val[KaggleDataSet.get_polarity_column_name()].values
         self.X_test = model_params.get_test_df()
         self.y_test = self.X_test[KaggleDataSet.get_polarity_column_name()].values
+        logger.info(f"{class_name}.{method_name}(): X_train: {len(self.X_train)}, y_train: {len(self.y_train)}, X_test: {len(self.X_test)}, y_test: {len(self.y_test)}, X_val: {len(self.X_val)}, y_val: {len(self.y_val)}")
         
         review_col = KaggleDataSet.get_review_column_name()
         self.train_texts = self.X_train[review_col].values

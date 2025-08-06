@@ -67,7 +67,14 @@ class SALSTMModel(SASentimentModel):
                 output_dim=128,
                 input_length=self.sequence_length
             ),
-            tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64, return_sequences=False)),
+            tf.keras.layers.Bidirectional(
+                tf.keras.layers.LSTM(
+                    64,
+                    return_sequences=False,
+                    dropout=0.3,           # Dropout between LSTM inputs
+                    recurrent_dropout=0.3  # Added recurrent dropout
+                )
+            ),
             tf.keras.layers.Dense(64, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.Dense(1, activation='sigmoid')
